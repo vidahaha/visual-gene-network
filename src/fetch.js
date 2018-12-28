@@ -1,7 +1,9 @@
 const API_HOST = "http://localhost:7001/"
 
-const getNetWorkData = ( cb ) => {
+export const getNetWorkData = ( cb ) => {
 	return fetch( API_HOST ).then( response => response.json() )
 }
 
-export default getNetWorkData
+export const getNetWorkChange = ( cb ) => {
+	return fetch( `${API_HOST}handle` ).then( response => response.json() )
+}

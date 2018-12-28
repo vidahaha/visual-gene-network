@@ -1,7 +1,20 @@
 @import 'reset.css';
 
 #root {
-  height: 100%;
-  width: 100%;
+  min-width: 1400px;
   text-align:center;
+  background: #ECF0FB;
+}
+
+#App {
+  padding-bottom: 10px;
+}
+
+footer {
+  min-height: 80px;
+  line-height: 80px;
+  text-align: center;
+  background: #0E3F99;
+  font-size: 16px;
+  color: #FFF;
 }
