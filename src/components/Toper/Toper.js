@@ -33,7 +33,7 @@ class Toper extends React.Component {
 		return ( 
 			<div className = "header" >
 				<div className="title">
-					<p>Fronties in Genome Engineering 2018</p>
+					<p>BnBeeEpi: An Approach of Epistasis Mining Based on Bee Colony Algorithm and Bayesian Network</p>
 				</div>
 				<Flex className="nav" alignItems="center" px={100}>
 					{this.state.navList.map((v, i) => {

@@ -24,15 +24,15 @@ class Index extends React.Component {
 				<div className="content">
 					<div className="home-wel">
 						<Carousel draggable={true} autoplay={true}>
-							<div className="item"><img src="/image/pic1.jpg" alt=""></img></div>
+							<div className="item"><img src="/image/pic1.png" alt=""></img></div>
 							<div className="item"><img src="/image/pic2.jpg" alt=""></img></div>
-							<div className="item"><img src="/image/pic3.jpg" alt=""></img></div>
-							<div className="item"><img src="/image/pic4.jpg" alt=""></img></div>		
+							<div className="item"><img className="small" src="/image/pic3.jpg" alt=""></img></div>
+							{/* <div className="item"><img src="/image/pic4.jpg" alt=""></img></div>		 */}
 						</Carousel>
 						<div className="wel-text">
-							<p className="title">Welcome Message</p>
+							<p className="title">Introduction</p>
 							<p className="desc">
-							Genome engineering is a truly revolutionary advance in biology, and has opened various new possibilities for other fields of science. We are pleased to announce that “Frontiers in Genome Engineering 2018”  will be held from October 22 to 25, 2018 in Beijing, China. The conference will offer an excellent environment for all participants to share ideas by providing stimulating talks from internationally renowned keynote speakers. Join us to discuss the newest genome engineering technologies and to learn the applications in areas ranging from agriculture to human health.
+							BnBeeEpi is built based on bnlearn R package, and aming to provide a new solution for epistasis. At first, we changed the mutual information calculator strategy according to this particular problem, then we introduced bee colony optimized algorithm to reduce false positive, and we also make MIT score as the other criterion to balance BIC score, so as to reduce false negative.
 							</p>
 						</div>
 					</div>
@@ -40,46 +40,23 @@ class Index extends React.Component {
 						<div className="left-box">
 							<div className="item">
 								<div className="box-title">
-									Invited Speakers
-								</div>
-								<div className="box-kv">
-									<div className="kv-item">
-										<img src="/image/k1.jpg" alt=""></img>
-										<p>David R. Liu</p>
-									</div>
-									<div className="kv-item">
-										<img src="/image/k2.jpg" alt=""></img>
-										<p>David R. Liu</p>
-									</div>
-									<div className="kv-item">
-										<img src="/image/k3.png" alt=""></img>
-										<p>David R. Liu</p>
-									</div>
-								</div>
-							</div>
-							<div className="item">
-								<div className="box-title">
 									Site Map
 								</div>
 								<div className="box-map">
-									<div id="mapView">
-									
+									<div id="mapView">						
 									</div>  
+									<div id="mapViewHide">						
+									</div> 
 								</div>
 							</div>
 							<div className="item">
 								<div className="box-title">
-									Transportation
+									How to site 
 								</div>
 								<div className="box-text">
-									<h3>Conference Venue：</h3>
+									{/* <h3>Conference Venue：</h3> */}
 									<p>
-									Building 1, The Institute of Genetics and Developmental Biology, Chinese Academy of Sciences
-									Address: Lincui East Road, Chaoyang District, Beijing, 100101
-									</p>
-									<h3>Taxi cab Information from the Airport：</h3>
-									<p>
-									It is highly recommended that you take a taxi from the airport. They are stationed in front of the terminal and will cost approximately RMB 100 (about 15~20 USD). 
+									Chen Yang<sup>#</sup>, Hui Gao<sup>#</sup>, Xuan Yang, Suiyu Huang, Yulong Kan, Jianxiao Liu*. BnBeeEpi: An Approach of Epistasis Mining Based on Bee Colony Algorithm and Bayesian Network, 2019 (submitted)
 									</p>
 								</div>
 							</div>
@@ -87,36 +64,28 @@ class Index extends React.Component {
 						<div className="right-box">
 							<div className="item">
 								<div className="title">
-									Important Dates
+									Process of BnBeeEpi
 								</div>
 								<div className="text-item">
-									<h3>Registration Open</h3>
-									<p>March 15, 2018</p>
+									<h3>1. Optimized markov blanket and improve the fast-iamb BN learning method</h3>
 								</div>
 								<div className="text-item">
-									<h3>Abstract Submission Deadline</h3>
-									<p>September 10, 2018</p>
+									<h3>2. Using two Bayesian network scoring methods: BIC and MIT</h3>
 								</div>
 								<div className="text-item">
-									<h3>Poster Submission Deadline</h3>
-									<p>September 30, 2018</p>
+									<h3>3. The bee colony algorithm is used to optimize the learned network</h3>
+								</div>
+								<div className="text-item">
+									<h3>4. Using scoring decomposition to deal with larger-scale network</h3>
 								</div>
 							</div>
 							<div className="item">
 								<div className="title">
-									Important Dates
+									News
 								</div>
 								<div className="text-item">
-									<h3>Registration Open</h3>
-									<p>March 15, 2018</p>
-								</div>
-								<div className="text-item">
-									<h3>Abstract Submission Deadline</h3>
-									<p>September 10, 2018</p>
-								</div>
-								<div className="text-item">
-									<h3>Poster Submission Deadline</h3>
-									<p>September 30, 2018</p>
+									<h3>Our first version of BnBeeEpi is available right now!</h3>
+									{/* <p>Number of pageviews to the website after October 20, 2017: 213676 hits</p> */}
 								</div>
 							</div>
 						</div>
@@ -127,10 +96,15 @@ class Index extends React.Component {
 	}
 
 	componentDidMount() {
-		let map = document.getElementById("mapView")
-		let script = document.createElement("script")
-		script.src = "http://rf.revolvermaps.com/0/0/8.js?i=5dbafy563a4&m=0&c=ff0000&cr1=ffffff&f=arial&l=33";
-		map.append(script)
+		const appendScript = (id, src) => {
+			let node = document.getElementById(id)
+			let script = document.createElement("script")
+			script.src = src
+			node.append( script )
+		}
+		appendScript('mapView', 'http://rf.revolvermaps.com/0/0/7.js?i=57rrgx4wq95&amp;m=1&amp;c=007eff&amp;cr1=0006ff&amp;sx=30&amp;ds=100')
+		// appendScript('mapViewHide', 'http://rf.revolvermaps.com/0/0/8.js?i=0opws7e2l4x&amp;m=0&amp;c=ff0000&amp;cr1=ffffff&amp;l=33')
+
 	}
 }
 

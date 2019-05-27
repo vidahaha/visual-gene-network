@@ -18,7 +18,10 @@ const routes = (
             <Route path="/demo" component={Demo} />
             <Route path="/contact" component={Contact} />
             <footer className="footer">
-                Copyright © 2018Institute of Genetics and Developmental Biology, Chinese Academy of Sciecnces
+                Huazhong Agricultural University,Wuhan, China
+                Code：430072 <br/>
+                Tel：+86-027-87280169 <br/>
+                E-mail：albert_yang@webmail.hzau.edu.cn
             </footer>
         </div>
     </BrowserRouter>

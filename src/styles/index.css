@@ -12,7 +12,8 @@
 
 footer {
   min-height: 80px;
-  line-height: 80px;
+  padding-top: 10px;
+  line-height: 30px;
   text-align: center;
   background: #0E3F99;
   font-size: 16px;

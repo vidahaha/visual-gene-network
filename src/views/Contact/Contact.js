@@ -2,8 +2,6 @@ import React from "react";
 import ReactDOM from "react-dom";
 import {
 	Button,
-	Table,
-	List
 } from 'antd';
 import "antd/dist/antd.css";
 import "./Contact.less";
@@ -16,13 +14,18 @@ class Contact extends React.Component {
 		this.state = {
 			date: new Date(),
 		};
-		this.listData = [
-			'Racing car sprays burning fuel into crowd.',
-			'Japanese princess to wed commoner.',
-			'Australian walks 100km after outback crash.',
-			'Man charged over missing wedding girl.',
-			'Los Angeles battles huge wildfires.',
-		  ];
+		
+	}
+
+	componentDidMount() {
+		// eslint-disable-next-line
+		let map = new BMap.Map("mapContainer"); 	
+		// eslint-disable-next-line
+		let point = new BMap.Point(114.364936,30.481629); 
+		map.centerAndZoom(point, 18); 
+		// eslint-disable-next-line
+		var marker = new BMap.Marker(point);        // 创建标注    
+		map.addOverlay(marker);                     // 将标注添加到地图中 	
 	}
 
 	render() {
@@ -30,27 +33,16 @@ class Contact extends React.Component {
 			<div className = "demo" >
 				<div className="content">
 					<div className="item" id="fItem">
-						<img src="/image/pic1.jpg"></img>
 						<div className="demo-text">
-							<p className="title">Input Format</p>
+							<p className="title">Questions</p>
 							<p className="desc">
-							Genome engineering is a truly revolutionary advance in biology, and has opened various new possibilities for other fields of science. We are pleased to announce that “Frontiers in Genome Engineering 2018”  will be held from October 22 to 25, 2018 in Beijing, China. The conference will offer an excellent environment for all participants to share ideas by providing stimulating talks from internationally renowned keynote speakers. Join us to discuss the newest genome engineering technologies and to learn the applications in areas ranging from agriculture to human health.
+							For questions or comments about our database, please contact liujianxiao@mail.hzau.edu.cn or albert_yang@webmail.hzau.edu.cn
 							</p>
-							<div className="download">
-								<p>Download Example File</p>
-								<Button id="dlBt" type="primary" icon="download">Download</Button>
-							</div>
 						</div>
 					</div>
 					<div className="item" id="sItem">
-						<div className="title">Introduction of parameters</div>
-						<List
-							header={<div>Header</div>}
-							footer={<div>Footer</div>}
-							bordered
-							dataSource={this.listData}
-							renderItem={item => (<List.Item>{item}</List.Item>)}
-						/>
+						<div className="title">Address</div>
+						<div id="mapContainer"></div> 
 					</div>
 				</div>
 			</div>
