@@ -42,7 +42,7 @@ class Demo extends React.Component {
 			introduction: 'used to adjust the threshold of fast-iamb, the higher this paremeter, the higher false positive, and if set this paremeter too small, may occur false negative.(recommend 0.05--0.001)'
 		  }, {
 			key: '2',
-			parameters: 'population.size',
+			parameters: 'honey.size',
 			introduction: 'used to adjust the number of bees.(recommend 3--10)'
 		}, {
 			key: '3',
@@ -103,6 +103,7 @@ class Demo extends React.Component {
 			// 持久化(只涉及到边)
 			this.immutableNetWorkData = fromJS( data.edgeList )
 			this.netWorkEdgeStageList = []
+			this.netWorkEdgeStageLabelList = []
 			this.netWorkEdgeStageList.push( this.immutableNetWorkData )
 
 			getDemoChange().then( data => {
@@ -283,9 +284,9 @@ class Demo extends React.Component {
 
 	drawDebugBox( data, stage ) {
 		let cur = this.state.debugText
-		cur.push(`---------------------- stage${stage} ----------------------`)
+		data.unshift(`---------------------- stage${stage} ----------------------`)	
 		this.setState({
-			debugText: cur.concat( data )
+			debugText: data.concat( cur )
 		})
 	}
 
@@ -344,7 +345,7 @@ class Demo extends React.Component {
 
 	changeNetwork( data ) {
 
-		const changeTime = 500
+		const changeTime = 1500
 
 		const finalRes = this.state.netWorkData.finalRes
 		let nodes = this.state.nodes
@@ -466,6 +467,7 @@ class Demo extends React.Component {
 
 				}, changeTime * d.stage)
 				this.netWorkEdgeStageList.push( edgeData )
+				this.netWorkEdgeStageLabelList.push( label )
 							
 				if ( index + 1 === data.length ) {
 
@@ -494,7 +496,7 @@ class Demo extends React.Component {
 						width: '100%',
 						height: '100%',
 						symbolSize(val, params) {
-							return params.name === 'Class'? 18 : val[0] * 1.6 + 8
+							return params.name === 'Class'? 22 : val[0] * 1.6 + 8
 						},
 						itemStyle: {
 							color(params) {
@@ -548,37 +550,8 @@ class Demo extends React.Component {
  
 		let netWorkSeries = [],
 			edges = [], // 新的边集合
-			label = [],
+			label = this.netWorkEdgeStageLabelList[ stage - 1 ],
 			edgeData = this.netWorkEdgeStageList[ stage - 1 ]
-
-		d.data.forEach( (s, index) => {	
-
-			let labelColor = '#333'
-			
-			let bcres = this.blockEdegChange(s, index, edgeData, label, labelColor )
-
-			label = bcres.label
-			edgeData = bcres.edgeData
-
-			// 被选中的情况
-			if ( d.select.length > 0 ) {
-				for ( let val of d.select ) {
-					if ( Number(val.block) === index + 1 ) {
-						labelColor = "#f84f4f"
-						s.bic = val.bic
-						s.mit = val.mit
-						s.type = val.type.split(' ')[0]
-						s.edges = val.type.split(' ')[1].split(',')
-
-						let bcres = this.blockEdegChange(s, index, edgeData, label, labelColor, true )
-
-						label = bcres.label
-						edgeData = bcres.edgeData
-					}
-				}
-			}
-			
-		})
 
 		// 新的边
 		edgeData.toJS().forEach( (bl, index) => { 
@@ -671,7 +644,7 @@ class Demo extends React.Component {
 						<div className="params">
 							<div className="tag-group">
 								<Tag color="blue">fast.alpha = 0.05</Tag>
-								<Tag color="geekblue">population.size = 5</Tag>
+								<Tag color="geekblue">honey.size = 5</Tag>
 								<Tag color="purple">k-locus = 2</Tag>
 								<Tag color="cyan">select-percent = 0.8</Tag>
 							</div>

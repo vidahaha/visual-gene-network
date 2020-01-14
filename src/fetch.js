@@ -1,7 +1,7 @@
 let API_HOST = "http://localhost:7001/"
 
 if ( process.env.NODE_ENV === 'production' ) {
-	API_HOST = "http://www.vidahaha.top:7001/"
+	API_HOST = "http://106.14.132.202:7001/"
 }
 
 export const getNetWorkData = ( cb ) => {
@@ -25,3 +25,4 @@ export const getNetWorkFile = ( cb ) => {
 }
 
 export const COMMON_HOST = API_HOST
+

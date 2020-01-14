@@ -60,6 +60,14 @@ class Index extends React.Component {
 									</p>
 								</div>
 							</div>
+							<div className="item">
+								<div className="box-title">
+									Download
+								</div>
+								<div className="box-text">
+									<a href="BnBeeEpi_1.0.tar.gz">Click here to download BnBeeEpi_1.0.tar.gz!</a>				
+								</div>		
+							</div>
 						</div>
 						<div className="right-box">
 							<div className="item">
@@ -84,10 +92,12 @@ class Index extends React.Component {
 									News
 								</div>
 								<div className="text-item">
-									<h3>Our first version of BnBeeEpi is available right now!</h3>
-									{/* <p>Number of pageviews to the website after October 20, 2017: 213676 hits</p> */}
+									<h3>Our first version of BnBeeEpi is available right now!</h3>				
 								</div>
-							</div>
+								<div className="text-item">
+									<h3>The recommended browsers are Chrome, Firefox, Safari, and Edge ( IE8 and earlier have poorer support and may give a lesser experience).</h3>
+								</div>			
+							</div>					
 						</div>
 					</div>
 				</div>

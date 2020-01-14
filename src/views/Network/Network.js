@@ -19,6 +19,7 @@ import echarts from 'echarts';
 import { List, fromJS } from 'immutable';
 import classNames from 'classnames';
 import { isNumber } from "util";
+import reqwest from 'reqwest';
 
 const Option = Select.Option;
 
@@ -39,9 +40,12 @@ class Network extends React.Component {
 			finalNodeShow: false,
 			mountNodeShow: false,
 			size: 5,
-			alpha: 0.001,
+			alpha: 0.05,
 			epi: 2,
 			pp: 0.8,
+			// 上传
+			fileList: [],
+    		uploading: false,
 		};
 		this.myChart = {};
 		let self = this;
@@ -49,68 +53,53 @@ class Network extends React.Component {
 			top: 100,
 			duration: 6,
 		});
-		this.uploadProps =  {
-			name: 'file',
-			action: COMMON_HOST + 'upload',
-			withCredentials: true,
-			headers: {
-			  authorization: 'authorization-text',
-			},
-			accept: '.txt',
-			data(file) {
-				return {
-					size: self.state.size,
-					alpha: self.state.alpha,
-					epi: self.state.epi,
-					pp: self.state.pp
+
+		this.handleUpload = () => {
+			const { fileList } = this.state;
+			const formData = new FormData();
+
+			formData.append('file', fileList[0]);
+			formData.append('size', this.state.size);
+			formData.append('alpha', this.state.alpha);
+			formData.append('epi', this.state.epi);
+			formData.append('pp', this.state.pp);
+		
+			this.setState({
+			  uploading: true,
+			});
+		
+			// You can use any AJAX library you like
+			reqwest({
+			  url: COMMON_HOST + 'upload',
+			  method: 'post',
+			  headers: {
+				authorization: 'authorization-text',
+			  },
+			  processData: false,
+			  withCredentials: true,
+			  data: formData,
+			  success: ses => {
+				this.setState({
+				  fileList: [],
+				  uploading: false,
+				});
+				if ( ses.status === 1 ) {
+					message.success('upload successfully.');
+					this.startInit()
+				} else {
+					message.error( ses.msg )
 				}
-			},
-			beforeUpload() {
-				const filterParams = (data, lower, upper, name)  => {
-					if ( data === "" ) {
-						message.error(`please complete ${name} `);
-						return true
-					}
-					data = Number( data )
-					if ( isNaN( data ) ) {
-						message.error(`please complete ${name} by number.`);
-						return true
-					}
-					if ( data < lower || data > upper ) {
-						message.error(`${name} must in ${lower}--${upper} !`);
-						return true
-					}
-				}	
-				
-				if ( filterParams( self.state.size, 3, 10, 'population.size' ) ) {
-					return false;
-				}
-				if ( filterParams( self.state.alpha, 0.001, 0.05, 'fast.alpha' ) ) {
-					return false;
-				}
-				if ( filterParams( self.state.epi, 2, 3, 'k-locus' ) ) {
-					return false;
-				}
-				if ( filterParams( self.state.pp, 0, 1, 'select-percent' ) ) {
-					return false;
-				}
-			},
-			onChange(info) {				
-			  if (info.file.status === 'done') {
-				message.success(`${info.file.name} file uploaded successfully`);
-			  } else if (info.file.status === 'error') {
-				message.error(`${info.file.name} file upload failed.`);
-			  }
-			  if (info.file.response ) {
-				  if ( info.file.response.status === 1 ) {
-					self.startInit()
-				  } else {
-					let msg = info.file.response.msg
-					message.error( msg )
-				  }
-			  } 
-			},
+			  },
+			  error: err => {
+				this.setState({
+				  uploading: false,
+				});
+				message.error( err.msg );
+			  },
+			});
 		};
+
+			
 		this.menu = (
 			<Menu>
 				<Menu.Item>
@@ -151,6 +140,7 @@ class Network extends React.Component {
 			// 持久化(只涉及到边)
 			this.immutableNetWorkData = fromJS( data.edgeList )
 			this.netWorkEdgeStageList = []
+			this.netWorkEdgeStageLabelList = []
 			this.netWorkEdgeStageList.push( this.immutableNetWorkData )
 
 			getNetWorkChange().then( data => {
@@ -315,7 +305,7 @@ class Network extends React.Component {
 
 	changeNetwork( data ) {
 
-		const changeTime = 500
+		const changeTime = 1500
 
 		const finalRes = this.state.netWorkData.finalRes
 		let nodes = this.state.nodes
@@ -433,6 +423,8 @@ class Network extends React.Component {
 
 				}, changeTime * d.stage)
 				this.netWorkEdgeStageList.push( edgeData )
+				this.netWorkEdgeStageLabelList.push( label )
+
 							
 				if ( index + 1 === data.length ) {
 
@@ -501,9 +493,9 @@ class Network extends React.Component {
 
 	drawDebugBox( data, stage ) {
 		let cur = this.state.debugText
-		cur.push(`---------------------- stage${stage} ----------------------`)
+		data.unshift(`---------------------- stage${stage} ----------------------`)	
 		this.setState({
-			debugText: cur.concat( data )
+			debugText: data.concat( cur )
 		})
 	}
 
@@ -564,35 +556,8 @@ class Network extends React.Component {
  
 		let netWorkSeries = [],
 			edges = [], // 新的边集合
-			label = [],
+			label = this.netWorkEdgeStageLabelList[ stage - 1 ],			
 			edgeData = this.netWorkEdgeStageList[ stage - 1 ]
-
-		d.data.forEach( (s, index) => {	
-
-			let labelColor = '#333'
-					let bcres = this.blockEdegChange(s, index, edgeData, label, labelColor )
-
-					label = bcres.label
-					edgeData = bcres.edgeData
-
-					// 被选中的情况
-					if ( d.select.length > 0 ) {
-						for ( let val of d.select ) {
-							if ( Number(val.block) === index + 1 ) {
-								labelColor = "#f84f4f"
-								s.bic = val.bic
-								s.mit = val.mit
-								s.type = val.type.split(' ')[0]
-								s.edges = val.type.split(' ')[1].split(',')
-
-								let bcres = this.blockEdegChange(s, index, edgeData, label, labelColor, true )
-
-								label = bcres.label
-								edgeData = bcres.edgeData
-							}
-						}
-					}
-		})
 
 		// 新的边
 		edgeData.toJS().forEach( (bl, index) => { 
@@ -672,12 +637,61 @@ class Network extends React.Component {
 			'active': this.state.finalNodeShow,
 			'show': this.state.finalNodeShow
 		})
+		const { uploading, fileList } = this.state;
+		const uploadProps = {
+		onRemove: file => {
+			this.setState(state => {
+			const index = state.fileList.indexOf(file);
+			const newFileList = state.fileList.slice();
+			newFileList.splice(index, 1);
+			return {
+				fileList: newFileList,
+			};
+			});
+		},
+		beforeUpload: file => {
+			const filterParams = (data, lower, upper, name)  => {
+				if ( data === "" ) {
+					message.error(`please complete ${name} `);
+					return true
+				}
+				data = Number( data )
+				if ( isNaN( data ) ) {
+					message.error(`please complete ${name} by number.`);
+					return true
+				}
+				if ( data < lower || data > upper ) {
+					message.error(`${name} must in ${lower}--${upper} !`);
+					return true
+				}
+			}	
+			
+			if ( filterParams( this.state.size, 3, 10, 'honey.size' ) ) {
+				return false;
+			}
+			if ( filterParams( this.state.alpha, 0.001, 0.05, 'fast.alpha' ) ) {
+				return false;
+			}
+			if ( filterParams( this.state.epi, 2, 3, 'k-locus' ) ) {
+				return false;
+			}
+			if ( filterParams( this.state.pp, 0, 1, 'select-percent' ) ) {
+				return false;
+			}
+
+			this.setState(state => ({
+				fileList: [file],
+			}));
+			return false;
+		},
+		fileList,
+		};
 		return ( 
 			<div className = "net" >
 				<div className="upload-table">				
 					<div className="text-wrap">
 						<p className="desc">
-						&emsp;The user should upload right format file which contains the case-control data as the input for the programme. The first line of the iput file contains the SNP IDs and the name for the reponse variable(last column).<br/>
+						&emsp;The user should upload right format file which contains the case-control data as the input for the programme. The first line of the input file contains the SNP IDs and the name for the reponse variable(last column).<br/>
 						&emsp;The following lines are the genotype data which should be coded by 0, 1, 2 with each line corresponding to one individual.<br/>
 						&emsp;The last column should contain the disease status of each individual coded by 0 and 1.<br/>
 						&emsp;The following is a sample data file for 5 individuals(3 cases and 2 controls), each genotyped for 10 SNPs. And also you can download this whole file
@@ -686,7 +700,7 @@ class Network extends React.Component {
 							<div className="u-file">
 								<Tag color="blue">fast.alpha</Tag>
 								<Input 
-								placeholder="0.001" 
+								placeholder="0.05" 
 								value={this.state.alpha}
 								onChange={
 									e => { this.setState({ alpha: e.target.value }) }
@@ -694,7 +708,7 @@ class Network extends React.Component {
 								<p>recommend 0.05--0.001</p>
 							</div>
 							<div className="u-file">
-								<Tag color="geekblue">population.size</Tag>
+								<Tag color="geekblue">honey.size</Tag>
 								<Input 
 									placeholder="5" 
 									value={this.state.size}
@@ -729,13 +743,22 @@ class Network extends React.Component {
 								/>
 								<p>recommend 0--1</p>								
 							</div>
-							<div className="u-file">
+							<div className="u-file ufe">
 								<Tag color="cyan">file</Tag>
-								<Upload {...this.uploadProps}>
+								<Upload {...uploadProps}>
 									<Button>
-									<Icon type="upload" /> Click to Upload and Run
+									<Icon type="upload" /> Select File
 									</Button>
 								</Upload>
+								<Button
+									type="primary"
+									onClick={this.handleUpload}
+									disabled={fileList.length === 0}
+									loading={uploading}
+									style={{ marginLeft: 16 }}
+									>
+									{uploading ? 'Running' : 'Upload and Run'}
+								</Button>
 							</div>
 						</div>
 					</div>	
